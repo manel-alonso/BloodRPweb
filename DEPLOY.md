@@ -25,6 +25,8 @@ En **Settings** → **Environment Variables**, añade:
 | `DISCORD_BOT_TOKEN` | Token del bot de Discord | Bot debe estar en el servidor con permiso para leer miembros |
 | `DISCORD_GUILD_ID` | ID del servidor Discord | Para verificar whitelist por roles |
 | `WHITELIST_ROLE_IDS` | IDs de roles separados por coma | Roles que indican que el usuario está whitelisted |
+| `WHITELIST_REVIEW_CHANNEL_ID` | ID del canal #whitelist-review | Donde el bot envía las solicitudes |
+| `WHITELIST_REVISION_ROLE_ID` | ID del rol WhitelistRevision | Se asigna al usuario tras enviar el formulario |
 
 ### 3. Discord Redirect URIs
 
@@ -81,6 +83,8 @@ Para que la página de Whitelist funcione:
 3. **Guild ID**: Activa "Developer Mode" en Discord (Configuración → Avanzado), clic derecho en tu servidor → "Copiar ID del servidor". Añádelo como `DISCORD_GUILD_ID`
 4. **Roles de whitelist**: Clic derecho en el rol que indica whitelist → "Copiar ID del rol". Añade uno o más IDs separados por coma en `WHITELIST_ROLE_IDS`
 5. **Invitar el bot** al servidor con el permiso "Ver miembros del servidor" (Server Members Intent si usas privilegios)
+6. **Crear el rol "WhitelistRevision"** en el servidor y copiar su ID (clic derecho → Copiar ID). El rol del bot debe estar **por encima** de WhitelistRevision en la jerarquía para poder asignarlo.
+7. **Crear el canal #whitelist-review** (o usar uno existente) y copiar su ID (clic derecho → Copiar ID). El bot debe tener permiso para enviar mensajes en ese canal.
 
 ---
 

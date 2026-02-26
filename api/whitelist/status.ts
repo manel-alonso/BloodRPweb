@@ -16,6 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const botToken = process.env.DISCORD_BOT_TOKEN;
   const guildId = process.env.DISCORD_GUILD_ID;
   const whitelistRoleIds = (process.env.WHITELIST_ROLE_IDS || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const revisionRoleId = process.env.WHITELIST_REVISION_ROLE_ID?.trim();
 
   if (!userId || !botToken || !guildId) {
     return res.status(400).json({
@@ -55,13 +56,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       whitelistRoleIds.length === 0
         ? false
         : userRoles.some((roleId) => whitelistRoleIds.includes(roleId));
+    const hasSubmittedRevision =
+      !!revisionRoleId && userRoles.includes(revisionRoleId);
 
     return res.status(200).json({
       status: isWhitelisted ? 'whitelisted' : 'pending',
       message: isWhitelisted
         ? 'Estás en la whitelist del servidor.'
-        : 'Tu solicitud está pendiente o no tienes el rol de whitelist.',
+        : hasSubmittedRevision
+          ? 'Tu solicitud está en revisión. Espera a que el staff te responda.'
+          : 'Tu solicitud está pendiente o no tienes el rol de whitelist.',
       roles: userRoles,
+      hasSubmittedRevision,
     });
   } catch (err) {
     console.error('Whitelist API error:', err);
