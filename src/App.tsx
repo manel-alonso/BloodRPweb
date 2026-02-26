@@ -5,6 +5,9 @@ import { AuthProvider } from './contexts/AuthContext';
 import MarketingPage from './marketing-page/MarketingPage';
 import LoginPage from './pages/LoginPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
+import WhitelistPage from './pages/WhitelistPage';
+import JobsPage from './pages/JobsPage';
+import ShopPage from './pages/ShopPage';
 
 export default function App() {
   return (
@@ -16,6 +19,9 @@ export default function App() {
           <Route path="/" element={<MarketingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
+          <Route path="/whitelist" element={<WhitelistPage />} />
+          <Route path="/jobs" element={<JobsPage />} />
+          <Route path="/shop" element={<ShopPage />} />
         </Routes>
       </BrowserRouter>
       </AuthProvider>

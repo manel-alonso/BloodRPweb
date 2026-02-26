@@ -1,94 +1,99 @@
 import { useEffect, useState } from 'react';
-import { assetUrl } from '../utils/assetUrl';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
+import AppAppBar from '../marketing-page/components/AppAppBar';
+import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
+import { useAuth } from '../contexts/AuthContext';
+import { assetUrl } from '../utils/assetUrl';
 
 const YOUTUBE_VIDEO_ID = 'oTmImIk9Ukk';
 const YOUTUBE_EMBED_URL = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&mute=1&loop=1&playlist=${YOUTUBE_VIDEO_ID}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1`;
 
-const REDIRECT_DELAY_SEC = 5;
+type WhitelistStatus = 'whitelisted' | 'pending' | 'not_in_server' | 'unknown';
 
-export default function AuthCallbackPage() {
-  const [searchParams] = useSearchParams();
+interface WhitelistResponse {
+  status: WhitelistStatus;
+  message: string;
+  roles?: string[];
+}
+
+export default function WhitelistPage() {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { user } = useAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [countdown, setCountdown] = useState(REDIRECT_DELAY_SEC);
-  const error = searchParams.get('error');
-  const code = searchParams.get('code');
+  const [data, setData] = useState<WhitelistResponse | null>(null);
 
   useEffect(() => {
-    if (error) {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    if (!user.id) {
       setStatus('error');
       return;
     }
 
-    if (!code) {
-      setStatus('error');
-      return;
-    }
-
-    const authCode = code;
     const base = import.meta.env.BASE_URL || '/';
-    const redirectUri =
-      (import.meta.env.VITE_DISCORD_REDIRECT_URI as string | undefined) ||
-      new URL('auth/callback', window.location.origin + base).href;
     const apiUrl =
       (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ||
       window.location.origin + (base === '/' ? '' : base.replace(/\/$/, ''));
 
     let cancelled = false;
 
-    async function fetchUser() {
+    async function fetchStatus() {
       try {
         const res = await fetch(
-          `${apiUrl}/api/auth/discord?code=${encodeURIComponent(authCode)}&redirect_uri=${encodeURIComponent(redirectUri)}`
+          `${apiUrl}/api/whitelist/status?userId=${encodeURIComponent(user!.id!)}`
         );
         if (cancelled) return;
         if (res.ok) {
-          const data = (await res.json()) as { username: string; avatar?: string; id?: string };
-          setUser({ username: data.username, avatar: data.avatar, id: data.id });
+          const json = (await res.json()) as WhitelistResponse;
+          setData(json);
+          setStatus('success');
         } else {
-          setUser({ username: 'Usuario' });
+          setStatus('error');
         }
       } catch {
-        if (!cancelled) setUser({ username: 'Usuario' });
-      } finally {
-        if (!cancelled) setStatus('success');
+        if (!cancelled) setStatus('error');
       }
     }
 
-    fetchUser();
+    fetchStatus();
     return () => {
       cancelled = true;
     };
-  }, [code, error, setUser]);
+  }, [user, navigate]);
 
-  useEffect(() => {
-    if (status === 'loading') return;
+  if (!user) return null;
 
-    const targetPath = status === 'success' ? '/' : '/login';
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          navigate(targetPath);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+  const statusColor =
+    data?.status === 'whitelisted'
+      ? 'success'
+      : data?.status === 'pending'
+        ? 'warning'
+        : data?.status === 'not_in_server'
+          ? 'error'
+          : 'default';
 
-    return () => clearInterval(timer);
-  }, [status, navigate]);
+  const statusLabel =
+    data?.status === 'whitelisted'
+      ? 'En la whitelist'
+      : data?.status === 'pending'
+        ? 'Pendiente'
+        : data?.status === 'not_in_server'
+          ? 'No estás en el servidor'
+          : 'Desconocido';
 
   return (
+    <>
+      <AppAppBar />
     <Box
       sx={{
         position: 'relative',
@@ -100,7 +105,6 @@ export default function AuthCallbackPage() {
         overflow: 'hidden',
       }}
     >
-      {/* Video background - same as Login */}
       <Box
         sx={{
           position: 'absolute',
@@ -161,61 +165,71 @@ export default function AuthCallbackPage() {
               src={assetUrl('LOGO_png.png')}
               alt="Blood RP"
               sx={{
-                height: 64,
+                height: 48,
                 width: 'auto',
-                maxWidth: 200,
+                maxWidth: 160,
                 objectFit: 'contain',
                 mb: 3,
               }}
             />
+            <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: 700, color: '#fff' }}>
+              Estado de Whitelist
+            </Typography>
 
             {status === 'loading' && (
               <>
-                <CircularProgress sx={{ mb: 2, color: '#fff' }} />
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#fff' }}>
-                  Completando inicio de sesión...
-                </Typography>
+                <CircularProgress sx={{ my: 3, color: '#fff' }} />
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                  Serás redirigido en un momento.
+                  Comprobando tu estado...
                 </Typography>
               </>
             )}
 
-            {status === 'success' && (
+            {status === 'success' && data && (
               <>
-                <Typography variant="h5" gutterBottom sx={{ color: '#4caf50', fontWeight: 600 }}>
-                  ¡Bienvenido a Blood RP!
-                </Typography>
+                <Chip
+                  label={statusLabel}
+                  color={statusColor}
+                  sx={{ mb: 2, fontWeight: 600 }}
+                />
                 <Typography
                   variant="body1"
-                  sx={{ mb: 2, color: 'rgba(255,255,255,0.8)' }}
+                  sx={{ mb: 3, color: 'rgba(255,255,255,0.8)' }}
                 >
-                  Has iniciado sesión correctamente con Discord.
+                  {data.message}
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                  Redirigiendo en {countdown} segundos...
-                </Typography>
+                {data.status === 'not_in_server' && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    href="https://discord.gg"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Unirse al Discord
+                  </Button>
+                )}
               </>
             )}
 
             {status === 'error' && (
-              <>
-                <Typography variant="h5" gutterBottom sx={{ color: '#f44336', fontWeight: 600 }}>
-                  Error al iniciar sesión
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 2, color: 'rgba(255,255,255,0.8)' }}>
-                  {error === 'access_denied'
-                    ? 'Has cancelado el inicio de sesión.'
-                    : 'Algo salió mal. Por favor, inténtalo de nuevo.'}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                  Redirigiendo en {countdown} segundos...
-                </Typography>
-              </>
+              <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)', mb: 2 }}>
+                No se pudo conectar con el servidor. Inténtalo más tarde.
+              </Typography>
             )}
+
+            <Button
+              variant="outlined"
+              color="inherit"
+              onClick={() => navigate('/')}
+              sx={{ mt: 3, borderColor: 'rgba(255,255,255,0.3)' }}
+            >
+              Volver al inicio
+            </Button>
           </CardContent>
         </Card>
       </Container>
     </Box>
+    </>
   );
 }

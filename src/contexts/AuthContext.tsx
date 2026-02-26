@@ -5,6 +5,7 @@ const AUTH_STORAGE_KEY = 'bloodrp_auth';
 export interface AuthUser {
   username: string;
   avatar?: string;
+  id?: string;
 }
 
 interface AuthState {

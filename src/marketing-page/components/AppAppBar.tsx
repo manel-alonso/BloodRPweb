@@ -94,6 +94,37 @@ export default function AppAppBar() {
                 <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500 }}>
                   {user.username}
                 </Typography>
+                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                <Button
+                  component={RouterLink}
+                  to="/whitelist"
+                  variant="text"
+                  size="small"
+                  color="inherit"
+                  sx={{ minWidth: 0 }}
+                >
+                  Whitelist
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to="/jobs"
+                  variant="text"
+                  size="small"
+                  color="inherit"
+                  sx={{ minWidth: 0 }}
+                >
+                  Jobs
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to="/shop"
+                  variant="text"
+                  size="small"
+                  color="inherit"
+                  sx={{ minWidth: 0 }}
+                >
+                  Shop
+                </Button>
               </Box>
             ) : (
               <Button color="primary" variant="text" size="small" component={RouterLink} to="/login">
@@ -129,18 +160,30 @@ export default function AppAppBar() {
                 <MenuItem component="a" href="#" onClick={toggleDrawer(false)}>Normas</MenuItem>
                 <Divider sx={{ my: 3 }} />
                 {user ? (
-                  <MenuItem onClick={toggleDrawer(false)}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                      <Avatar
-                        src={user.avatar}
-                        alt={user.username}
-                        sx={{ width: 28, height: 28 }}
-                      />
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {user.username}
-                      </Typography>
-                    </Box>
-                  </MenuItem>
+                  <>
+                    <MenuItem onClick={toggleDrawer(false)}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Avatar
+                          src={user.avatar}
+                          alt={user.username}
+                          sx={{ width: 28, height: 28 }}
+                        />
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {user.username}
+                        </Typography>
+                      </Box>
+                    </MenuItem>
+                    <Divider sx={{ my: 1 }} />
+                    <MenuItem component={RouterLink} to="/whitelist" onClick={toggleDrawer(false)}>
+                      Whitelist
+                    </MenuItem>
+                    <MenuItem component={RouterLink} to="/jobs" onClick={toggleDrawer(false)}>
+                      Jobs
+                    </MenuItem>
+                    <MenuItem component={RouterLink} to="/shop" onClick={toggleDrawer(false)}>
+                      Shop
+                    </MenuItem>
+                  </>
                 ) : (
                   <MenuItem onClick={toggleDrawer(false)}>
                     <Button

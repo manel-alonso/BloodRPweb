@@ -22,6 +22,9 @@ En **Settings** → **Environment Variables**, añade:
 | `VITE_DISCORD_CLIENT_ID` | Tu Client ID de Discord | De [Discord Developer Portal](https://discord.com/developers/applications) → tu app → OAuth2 |
 | `DISCORD_CLIENT_SECRET` | Tu Client Secret de Discord | Mismo lugar, **nunca** lo expongas en el frontend |
 | `VITE_BASE_URL` | `/` | Para que la app esté en la raíz (ej. `tudominio.vercel.app`) |
+| `DISCORD_BOT_TOKEN` | Token del bot de Discord | Bot debe estar en el servidor con permiso para leer miembros |
+| `DISCORD_GUILD_ID` | ID del servidor Discord | Para verificar whitelist por roles |
+| `WHITELIST_ROLE_IDS` | IDs de roles separados por coma | Roles que indican que el usuario está whitelisted |
 
 ### 3. Discord Redirect URIs
 
@@ -66,6 +69,18 @@ Así el frontend sabrá dónde llamar al API para intercambiar el código.
 Añade en Discord:
 - `https://manel-alonso.github.io/BloodRPweb/auth/callback` (tu URL de GitHub Pages)
 - `http://localhost:5173/BloodRPweb/auth/callback` (dev local)
+
+---
+
+## Configurar Whitelist (Discord Bot)
+
+Para que la página de Whitelist funcione:
+
+1. **Crear un bot** en [Discord Developer Portal](https://discord.com/developers/applications) → tu app → Bot → Add Bot
+2. **Token**: Copia el token del bot y añádelo como `DISCORD_BOT_TOKEN` en Vercel
+3. **Guild ID**: Activa "Developer Mode" en Discord (Configuración → Avanzado), clic derecho en tu servidor → "Copiar ID del servidor". Añádelo como `DISCORD_GUILD_ID`
+4. **Roles de whitelist**: Clic derecho en el rol que indica whitelist → "Copiar ID del rol". Añade uno o más IDs separados por coma en `WHITELIST_ROLE_IDS`
+5. **Invitar el bot** al servidor con el permiso "Ver miembros del servidor" (Server Members Intent si usas privilegios)
 
 ---
 
