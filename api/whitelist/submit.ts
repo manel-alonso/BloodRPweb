@@ -3,11 +3,21 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 const DISCORD_API = 'https://discord.com/api/v10';
 
 const FORM_QUESTIONS: { key: string; label: string }[] = [
-  { key: 'characterName', label: 'Nombre de personaje' },
-  { key: 'age', label: 'Edad' },
-  { key: 'experience', label: 'Experiencia en roleplay' },
-  { key: 'reason', label: '¿Por qué quieres unirte al servidor?' },
-  { key: 'additional', label: 'Información adicional (opcional)' },
+  { key: 'q1', label: '¿Qué es el rol de entorno y cómo se aplica correctamente en una situación de tiroteo en vía pública?' },
+  { key: 'q2', label: 'Explica la diferencia entre IC (In Character) y OOC (Out Of Character) y da un ejemplo práctico de cada uno.' },
+  { key: 'q3', label: '¿Qué es el MetaGaming? Describe una situación compleja donde podría ocurrir sin que el jugador se dé cuenta.' },
+  { key: 'q4', label: 'Define PowerGaming y explica por qué está prohibido en servidores de roleplay serio.' },
+  { key: 'q5', label: '¿Cómo actuarías correctamente si tu personaje recibe una herida de bala en el brazo?' },
+  { key: 'q6', label: 'Explica qué es el Fearplay y cómo debe aplicarse ante múltiples atacantes armados.' },
+  { key: 'q7', label: '¿Qué es el CK (Character Kill) y en qué situaciones debería aprobarse?' },
+  { key: 'q8', label: 'Describe cómo desarrollarías la historia completa de tu personaje antes de entrar al servidor.' },
+  { key: 'q9', label: '¿Qué harías si presencias un bug que te beneficia económicamente dentro del servidor?' },
+  { key: 'q10', label: 'Explica qué es el Revenge Kill y por qué rompe la experiencia de rol.' },
+  { key: 'q11', label: 'En una persecución policial en Los Santos, ¿qué límites de rol deberías respetar?' },
+  { key: 'q12', label: '¿Cómo se debe iniciar correctamente un rol agresivo sin caer en PG o MG?' },
+  { key: 'q13', label: 'Explica qué es el NLR (New Life Rule) y cómo afecta a tu memoria tras morir.' },
+  { key: 'q14', label: 'Si eres policía y un amigo comete un delito IC, ¿cómo actuarías?' },
+  { key: 'q15', label: '¿Qué significa interpretar correctamente el entorno de Los Santos y cómo afecta a la inmersión?' },
 ];
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -68,37 +78,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    const lines: string[] = [
+    const header = [
       `**Nueva solicitud de whitelist**`,
       `**Usuario:** ${username} (<@${userId}>)`,
       `**ID:** ${userId}`,
       ``,
-      `**Respuestas:**`,
-    ];
+    ].join('\n');
 
-    for (const { key, label } of FORM_QUESTIONS) {
+    const answersText = FORM_QUESTIONS.map(({ key, label }) => {
       const value = answers[key] ?? '(sin respuesta)';
-      lines.push(`**${label}:**\n${value}`);
-      lines.push('');
+      return `**${label}**\n${value}\n`;
+    }).join('\n');
+
+    const fullContent = header + '**Respuestas:**\n\n' + answersText;
+    const maxLen = 1900;
+    const chunks: string[] = [];
+    let remaining = fullContent;
+    while (remaining.length > 0) {
+      chunks.push(remaining.slice(0, maxLen));
+      remaining = remaining.slice(maxLen);
     }
 
-    const messageContent = lines.join('\n');
+    for (const chunk of chunks) {
+      const sendRes = await fetch(`${DISCORD_API}/channels/${channelId}/messages`, {
+        method: 'POST',
+        headers: {
+          ...authHeader,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: chunk }),
+      });
 
-    const sendRes = await fetch(`${DISCORD_API}/channels/${channelId}/messages`, {
-      method: 'POST',
-      headers: {
-        ...authHeader,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        content: messageContent.slice(0, 2000),
-      }),
-    });
-
-    if (!sendRes.ok) {
-      const err = await sendRes.text();
-      console.error('Discord message send error:', sendRes.status, err);
-      return res.status(500).json({ error: 'Failed to send message to channel' });
+      if (!sendRes.ok) {
+        const err = await sendRes.text();
+        console.error('Discord message send error:', sendRes.status, err);
+        return res.status(500).json({ error: 'Failed to send message to channel' });
+      }
     }
 
     const addRoleRes = await fetch(

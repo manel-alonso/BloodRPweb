@@ -19,12 +19,22 @@ const YOUTUBE_EMBED_URL = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?aut
 
 const DISCORD_INVITE = (import.meta.env.VITE_DISCORD_INVITE_URL as string) || 'https://discord.gg';
 
-const FORM_FIELDS: { key: string; label: string; required: boolean; multiline?: boolean }[] = [
-  { key: 'characterName', label: 'Nombre de personaje', required: true },
-  { key: 'age', label: 'Edad', required: true },
-  { key: 'experience', label: 'Experiencia en roleplay', required: true, multiline: true },
-  { key: 'reason', label: '¿Por qué quieres unirte al servidor?', required: true, multiline: true },
-  { key: 'additional', label: 'Información adicional (opcional)', required: false, multiline: true },
+const FORM_FIELDS: { key: string; label: string; required: boolean }[] = [
+  { key: 'q1', label: '¿Qué es el rol de entorno y cómo se aplica correctamente en una situación de tiroteo en vía pública?', required: true },
+  { key: 'q2', label: 'Explica la diferencia entre IC (In Character) y OOC (Out Of Character) y da un ejemplo práctico de cada uno.', required: true },
+  { key: 'q3', label: '¿Qué es el MetaGaming? Describe una situación compleja donde podría ocurrir sin que el jugador se dé cuenta.', required: true },
+  { key: 'q4', label: 'Define PowerGaming y explica por qué está prohibido en servidores de roleplay serio.', required: true },
+  { key: 'q5', label: '¿Cómo actuarías correctamente si tu personaje recibe una herida de bala en el brazo?', required: true },
+  { key: 'q6', label: 'Explica qué es el Fearplay y cómo debe aplicarse ante múltiples atacantes armados.', required: true },
+  { key: 'q7', label: '¿Qué es el CK (Character Kill) y en qué situaciones debería aprobarse?', required: true },
+  { key: 'q8', label: 'Describe cómo desarrollarías la historia completa de tu personaje antes de entrar al servidor.', required: true },
+  { key: 'q9', label: '¿Qué harías si presencias un bug que te beneficia económicamente dentro del servidor?', required: true },
+  { key: 'q10', label: 'Explica qué es el Revenge Kill y por qué rompe la experiencia de rol.', required: true },
+  { key: 'q11', label: 'En una persecución policial en Los Santos, ¿qué límites de rol deberías respetar?', required: true },
+  { key: 'q12', label: '¿Cómo se debe iniciar correctamente un rol agresivo sin caer en PG o MG?', required: true },
+  { key: 'q13', label: 'Explica qué es el NLR (New Life Rule) y cómo afecta a tu memoria tras morir.', required: true },
+  { key: 'q14', label: 'Si eres policía y un amigo comete un delito IC, ¿cómo actuarías?', required: true },
+  { key: 'q15', label: '¿Qué significa interpretar correctamente el entorno de Los Santos y cómo afecta a la inmersión?', required: true },
 ];
 
 type WhitelistStatus = 'whitelisted' | 'pending' | 'not_in_server' | 'unknown';
@@ -172,7 +182,7 @@ export default function WhitelistPage() {
           position: 'relative',
           minHeight: '100vh',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           justifyContent: 'center',
           py: 4,
           overflow: 'hidden',
@@ -221,7 +231,24 @@ export default function WhitelistPage() {
           />
         </Box>
 
-        <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
+        <Container
+          maxWidth="sm"
+          sx={{
+            position: 'relative',
+            zIndex: 1,
+            maxHeight: 'calc(100vh - 64px)',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            py: 2,
+            '&::-webkit-scrollbar': { width: 8 },
+            '&::-webkit-scrollbar-track': { bgcolor: 'rgba(0,0,0,0.2)' },
+            '&::-webkit-scrollbar-thumb': {
+              bgcolor: 'rgba(255,255,255,0.3)',
+              borderRadius: 4,
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.5)' },
+            },
+          }}
+        >
           <Card
             variant="outlined"
             sx={{
@@ -232,7 +259,7 @@ export default function WhitelistPage() {
               backdropFilter: 'blur(12px)',
             }}
           >
-            <CardContent>
+            <CardContent sx={{ '&:last-child': { pb: 4 } }}>
               <Box
                 component="img"
                 src={assetUrl('LOGO_png.png')}
@@ -324,27 +351,52 @@ export default function WhitelistPage() {
                       >
                         Completa el formulario para solicitar la whitelist:
                       </Typography>
-                      {FORM_FIELDS.map(({ key, label, required, multiline }) => (
-                        <TextField
-                          key={key}
-                          fullWidth
-                          required={required}
-                          multiline={!!multiline}
-                          rows={multiline ? 3 : 1}
-                          label={label}
-                          value={formValues[key] ?? ''}
-                          onChange={(e) =>
-                            setFormValues((prev) => ({ ...prev, [key]: e.target.value }))
-                          }
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              color: '#fff',
-                              '& fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.5)' },
-                            },
-                            '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
-                          }}
-                        />
+                      {FORM_FIELDS.map(({ key, label, required }) => (
+                        <Box key={key} sx={{ mb: 3 }}>
+                          <Typography
+                            component="label"
+                            htmlFor={`whitelist-${key}`}
+                            sx={{
+                              display: 'block',
+                              color: 'rgba(255,255,255,0.9)',
+                              fontSize: '0.875rem',
+                              fontWeight: 500,
+                              mb: 1,
+                            }}
+                          >
+                            {label}
+                            {required && ' *'}
+                          </Typography>
+                          <TextField
+                            id={`whitelist-${key}`}
+                            fullWidth
+                            required={required}
+                            multiline
+                            minRows={4}
+                            placeholder="Escribe tu respuesta..."
+                            value={formValues[key] ?? ''}
+                            onChange={(e) =>
+                              setFormValues((prev) => ({ ...prev, [key]: e.target.value }))
+                            }
+                            variant="outlined"
+                            InputProps={{
+                              sx: {
+                                color: '#fff',
+                                alignItems: 'flex-start',
+                                backgroundColor: 'rgba(0,0,0,0.2)',
+                                '& fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                                '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.5)' },
+                                '&.Mui-focused fieldset': { borderColor: 'rgba(255,255,255,0.7)' },
+                              },
+                            }}
+                            sx={{
+                              '& .MuiOutlinedInput-input': {
+                                color: '#fff',
+                                '&::placeholder': { color: 'rgba(255,255,255,0.5)', opacity: 1 },
+                              },
+                            }}
+                          />
+                        </Box>
                       ))}
                       {submitError && (
                         <Typography
