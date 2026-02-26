@@ -16,7 +16,7 @@ const container = {
   show: {
     opacity: 1,
     transition: { staggerChildren: 0.12, delayChildren: 0.2 },
-  },
+  }
 };
 
 const item = {
