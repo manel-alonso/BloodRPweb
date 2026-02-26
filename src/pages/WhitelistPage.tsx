@@ -9,7 +9,6 @@ import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
-import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import { useAuth } from '../contexts/AuthContext';
 import { useWhitelistStatus } from '../contexts/WhitelistStatusContext';
@@ -357,7 +356,7 @@ export default function WhitelistPage() {
                       sx={{
                         textAlign: 'left',
                         mt: 3,
-                        '& .MuiTextField-root': { mb: 2 },
+                        '& textarea': { mb: 2 },
                       }}
                     >
                       <Typography
@@ -382,32 +381,36 @@ export default function WhitelistPage() {
                             {label}
                             {required && ' *'}
                           </Typography>
-                          <TextField
+                          <Box
+                            component="textarea"
                             id={`whitelist-${key}`}
-                            fullWidth
+                            name={key}
                             required={required}
-                            multiline
-                            minRows={4}
+                            rows={4}
                             placeholder="Escribe tu respuesta..."
                             value={formValues[key] ?? ''}
                             onChange={(e) =>
                               setFormValues((prev) => ({ ...prev, [key]: e.target.value }))
                             }
-                            variant="outlined"
-                            InputProps={{
-                              sx: {
-                                color: '#fff',
-                                alignItems: 'flex-start',
-                                backgroundColor: 'rgba(0,0,0,0.2)',
-                                '& fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                                '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.5)' },
-                                '&.Mui-focused fieldset': { borderColor: 'rgba(255,255,255,0.7)' },
-                              },
-                            }}
                             sx={{
-                              '& .MuiOutlinedInput-input': {
-                                color: '#fff',
-                                '&::placeholder': { color: 'rgba(255,255,255,0.5)', opacity: 1 },
+                              width: '100%',
+                              display: 'block',
+                              p: 1.5,
+                              color: '#fff',
+                              backgroundColor: 'rgba(0,0,0,0.2)',
+                              border: '1px solid rgba(255,255,255,0.3)',
+                              borderRadius: 1,
+                              fontFamily: 'inherit',
+                              fontSize: '1rem',
+                              lineHeight: 1.5,
+                              resize: 'vertical',
+                              minHeight: 100,
+                              '&::placeholder': { color: 'rgba(255,255,255,0.5)', opacity: 1 },
+                              '&:hover': { borderColor: 'rgba(255,255,255,0.5)' },
+                              '&:focus': {
+                                outline: 'none',
+                                borderColor: 'rgba(255,255,255,0.7)',
+                                boxShadow: '0 0 0 1px rgba(255,255,255,0.7)',
                               },
                             }}
                           />
