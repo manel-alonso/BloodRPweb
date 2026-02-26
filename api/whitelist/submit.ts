@@ -127,8 +127,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!addRoleRes.ok) {
       const err = await addRoleRes.text();
       console.error('Discord add role error:', addRoleRes.status, err);
+      let discordMsg = '';
+      try {
+        const parsed = JSON.parse(err) as { message?: string; code?: number };
+        discordMsg = parsed.message || err;
+      } catch {
+        discordMsg = err;
+      }
       return res.status(500).json({
         error: 'Message sent but failed to add role. Contact staff.',
+        hint: discordMsg,
+        code: addRoleRes.status === 403 ? 'ROLE_HIERARCHY' : undefined,
       });
     }
 
