@@ -28,6 +28,7 @@ export default function WhitelistPage() {
   const { user } = useAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [data, setData] = useState<WhitelistResponse | null>(null);
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -37,6 +38,7 @@ export default function WhitelistPage() {
 
     if (!user.id) {
       setStatus('error');
+      setErrorDetail('no_id');
       return;
     }
 
@@ -57,11 +59,23 @@ export default function WhitelistPage() {
           const json = (await res.json()) as WhitelistResponse;
           setData(json);
           setStatus('success');
+          setErrorDetail(null);
         } else {
+          const errBody = await res.text();
+          setErrorDetail(`api_${res.status}`);
           setStatus('error');
+          if (import.meta.env.DEV) {
+            console.error('Whitelist API error:', res.status, errBody);
+          }
         }
-      } catch {
-        if (!cancelled) setStatus('error');
+      } catch (err) {
+        if (!cancelled) {
+          setErrorDetail('network');
+          setStatus('error');
+          if (import.meta.env.DEV) {
+            console.error('Whitelist fetch failed:', err);
+          }
+        }
       }
     }
 
@@ -213,9 +227,29 @@ export default function WhitelistPage() {
             )}
 
             {status === 'error' && (
-              <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)', mb: 2 }}>
-                No se pudo conectar con el servidor. Inténtalo más tarde.
-              </Typography>
+              <>
+                <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)', mb: 2 }}>
+                  {errorDetail === 'no_id'
+                    ? 'Tu sesión no tiene los datos necesarios. Cierra sesión e inicia sesión de nuevo con Discord para ver tu estado de whitelist.'
+                    : errorDetail === 'network'
+                      ? 'No se pudo conectar con el servidor. Si estás en local, añade VITE_API_URL en .env apuntando a tu despliegue en Vercel.'
+                      : 'No se pudo conectar con el servidor. Inténtalo más tarde.'}
+                </Typography>
+                {errorDetail === 'no_id' && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      localStorage.removeItem('bloodrp_auth');
+                      const base = import.meta.env.BASE_URL || '/';
+                      window.location.href = base === '/' ? '/' : base;
+                    }}
+                    sx={{ mb: 2 }}
+                  >
+                    Cerrar sesión e iniciar de nuevo
+                  </Button>
+                )}
+              </>
             )}
 
             <Button

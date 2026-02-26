@@ -9,8 +9,19 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const base = env.VITE_BASE_URL || '/BloodRPweb/';
 
+  const apiUrl = env.VITE_API_URL?.replace(/\/$/, '');
   return {
     base,
+    server: apiUrl
+      ? {
+          proxy: {
+            '/api': {
+              target: apiUrl,
+              changeOrigin: true,
+            },
+          },
+        }
+      : undefined,
     plugins: [
       react(),
       {
