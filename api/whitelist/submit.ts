@@ -65,10 +65,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!memberRes.ok) {
       const err = await memberRes.text();
       console.error('Discord member fetch error:', memberRes.status, err);
-      return res.status(500).json({ error: 'Failed to fetch member' });
+      return res.status(500).json({
+        error: 'Failed to fetch member from Discord',
+        code: 'DISCORD_MEMBER_FETCH',
+        hint: memberRes.status === 401 ? 'Invalid bot token' : memberRes.status === 404 ? 'User or guild not found' : err.slice(0, 200),
+      });
     }
 
-    const member = (await memberRes.json()) as { roles: string[] };
+    let member: { roles?: string[] };
+    try {
+      member = (await memberRes.json()) as { roles?: string[] };
+    } catch (parseErr) {
+      console.error('Discord member JSON parse error:', parseErr);
+      return res.status(500).json({ error: 'Invalid Discord API response', code: 'PARSE_ERROR' });
+    }
     const userRoles = member.roles || [];
 
     if (userRoles.includes(revisionRoleId)) {
@@ -112,7 +122,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!sendRes.ok) {
         const err = await sendRes.text();
         console.error('Discord message send error:', sendRes.status, err);
-        return res.status(500).json({ error: 'Failed to send message to channel' });
+        return res.status(500).json({
+          error: 'Failed to send message to channel',
+          code: 'DISCORD_SEND_MESSAGE',
+          hint: sendRes.status === 403 ? 'Bot lacks Send Messages in channel' : sendRes.status === 404 ? 'Channel not found' : err.slice(0, 200),
+        });
       }
     }
 
@@ -146,7 +160,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       message: 'Solicitud enviada correctamente. El staff la revisará pronto.',
     });
   } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
     console.error('Whitelist submit error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({
+      error: 'Internal server error',
+      code: 'UNEXPECTED',
+      hint: msg.slice(0, 200),
+    });
   }
 }

@@ -144,6 +144,8 @@ export default function WhitelistPage() {
         let msg = json.message || json.error || 'Error al enviar. Inténtalo más tarde.';
         if (json.code === 'ROLE_HIERARCHY') {
           msg += ' El staff debe mover el rol del bot por encima del rol WhitelistRevision en Configuración del servidor > Roles.';
+        } else if (json.hint) {
+          msg += ` (${json.hint})`;
         }
         setSubmitError(msg);
       }
