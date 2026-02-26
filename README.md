@@ -68,17 +68,13 @@ src/
 
 ## Login con Discord
 
-El sitio incluye autenticación solo con Discord (OAuth2):
+El sitio incluye autenticación con Discord (OAuth2) usando un API serverless para obtener avatar y nombre:
 
 1. Crea una aplicación en [Discord Developer Portal](https://discord.com/developers/applications)
-2. En OAuth2 → Redirects, añade: `http://localhost:5173/auth/callback` (dev) y tu URL de producción
-3. Copia `.env.example` a `.env` y configura:
-   - `VITE_DISCORD_CLIENT_ID` - Client ID de tu aplicación
-   - `VITE_DISCORD_REDIRECT_URI` - (opcional) Por defecto usa `{origin}/auth/callback`
+2. En OAuth2 → Redirects, añade tu URL de callback
+3. Copia `.env.example` a `.env` y configura `VITE_DISCORD_CLIENT_ID`
 
-Rutas: `/login` (iniciar sesión) y `/auth/callback` (retorno de Discord).
-
-**Nota**: Para completar el flujo OAuth (intercambiar el código por tokens y crear sesión), necesitarás un backend que procese el callback.
+**Para avatar y nombre real**: necesitas desplegar el API en Vercel. Ver [DEPLOY.md](DEPLOY.md) para instrucciones completas.
 
 ## Personalización
 

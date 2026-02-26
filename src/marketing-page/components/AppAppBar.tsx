@@ -10,6 +10,7 @@ import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
 import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
@@ -84,9 +85,16 @@ export default function AppAppBar() {
             }}
           >
             {user ? (
-              <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500 }}>
-                {user.username}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Avatar
+                  src={user.avatar}
+                  alt={user.username}
+                  sx={{ width: 28, height: 28 }}
+                />
+                <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500 }}>
+                  {user.username}
+                </Typography>
+              </Box>
             ) : (
               <Button color="primary" variant="text" size="small" component={RouterLink} to="/login">
                 Iniciar sesión
@@ -122,9 +130,16 @@ export default function AppAppBar() {
                 <Divider sx={{ my: 3 }} />
                 {user ? (
                   <MenuItem onClick={toggleDrawer(false)}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      {user.username}
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <Avatar
+                        src={user.avatar}
+                        alt={user.username}
+                        sx={{ width: 28, height: 28 }}
+                      />
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        {user.username}
+                      </Typography>
+                    </Box>
                   </MenuItem>
                 ) : (
                   <MenuItem onClick={toggleDrawer(false)}>

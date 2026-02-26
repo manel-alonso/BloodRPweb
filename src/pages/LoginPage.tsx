@@ -17,7 +17,10 @@ const DISCORD_REDIRECT_URI = import.meta.env.VITE_DISCORD_REDIRECT_URI as string
 function getDiscordAuthUrl(): string | null {
   const clientId = DISCORD_CLIENT_ID;
   if (!clientId || clientId === 'YOUR_CLIENT_ID') return null;
-  const redirectUri = DISCORD_REDIRECT_URI || `${window.location.origin}/auth/callback`;
+  const base = import.meta.env.BASE_URL || '/';
+  const redirectUri =
+    DISCORD_REDIRECT_URI ||
+    new URL('auth/callback', window.location.origin + base).href;
   const scope = encodeURIComponent('identify email');
   return `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}`;
 }

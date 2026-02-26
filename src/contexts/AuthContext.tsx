@@ -4,6 +4,7 @@ const AUTH_STORAGE_KEY = 'bloodrp_auth';
 
 export interface AuthUser {
   username: string;
+  avatar?: string;
 }
 
 interface AuthState {
@@ -22,7 +23,7 @@ function loadStoredUser(): AuthUser | null {
     const stored = localStorage.getItem(AUTH_STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored) as AuthUser;
-      return parsed.username ? parsed : null;
+      return parsed?.username ? parsed : null;
     }
   } catch {
     // ignore
