@@ -14,8 +14,10 @@ import Avatar from '@mui/material/Avatar';
 import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import Chip from '@mui/material/Chip';
 import Sitemark from './SitemarkIcon';
 import { useAuth } from '../../contexts/AuthContext';
+import { useWhitelistStatus } from '../../contexts/WhitelistStatusContext';
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: 'flex',
@@ -33,9 +35,35 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   padding: '8px 12px',
 }));
 
+function getApiUrl(): string {
+  const base = import.meta.env.BASE_URL || '/';
+  return (
+    (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ||
+    window.location.origin + (base === '/' ? '' : base.replace(/\/$/, ''))
+  );
+}
+
 export default function AppAppBar() {
   const [open, setOpen] = React.useState(false);
   const { user } = useAuth();
+  const { status: whitelistStatus, label: whitelistLabel, setStatus: setWhitelistStatus } = useWhitelistStatus();
+
+  React.useEffect(() => {
+    if (!user?.id) {
+      setWhitelistStatus(null);
+      return;
+    }
+    let cancelled = false;
+    fetch(`${getApiUrl()}/api/whitelist/status?userId=${encodeURIComponent(user.id)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.status) {
+          setWhitelistStatus(data.status, data.hasSubmittedRevision);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [user?.id, setWhitelistStatus]);
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -101,9 +129,25 @@ export default function AppAppBar() {
                   variant="text"
                   size="small"
                   color="inherit"
-                  sx={{ minWidth: 0 }}
+                  sx={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 1 }}
                 >
                   Whitelist
+                  {whitelistLabel && (
+                    <Chip
+                      label={whitelistLabel}
+                      size="small"
+                      color={
+                        whitelistStatus === 'whitelisted'
+                          ? 'success'
+                          : whitelistStatus === 'pending'
+                            ? 'warning'
+                            : whitelistStatus === 'not_in_server'
+                              ? 'error'
+                              : 'default'
+                      }
+                      sx={{ height: 20, fontSize: '0.7rem' }}
+                    />
+                  )}
                 </Button>
                 <Button
                   component={RouterLink}
@@ -175,7 +219,25 @@ export default function AppAppBar() {
                     </MenuItem>
                     <Divider sx={{ my: 1 }} />
                     <MenuItem component={RouterLink} to="/whitelist" onClick={toggleDrawer(false)}>
-                      Whitelist
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        Whitelist
+                        {whitelistLabel && (
+                          <Chip
+                            label={whitelistLabel}
+                            size="small"
+                            color={
+                              whitelistStatus === 'whitelisted'
+                                ? 'success'
+                                : whitelistStatus === 'pending'
+                                  ? 'warning'
+                                  : whitelistStatus === 'not_in_server'
+                                    ? 'error'
+                                    : 'default'
+                            }
+                            sx={{ height: 20, fontSize: '0.7rem' }}
+                          />
+                        )}
+                      </Box>
                     </MenuItem>
                     <MenuItem component={RouterLink} to="/jobs" onClick={toggleDrawer(false)}>
                       Jobs

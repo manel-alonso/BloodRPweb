@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Container from '@mui/material/Container';
@@ -89,6 +90,12 @@ export default function Highlights() {
         <Grid container spacing={2}>
           {items.map((item, index) => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.08, duration: 0.5 }}
+              >
               <Stack
                 direction="column"
                 component={Card}
@@ -104,9 +111,10 @@ export default function Highlights() {
                     borderColor: 'primary.main',
                     backgroundColor: 'grey.700',
                   },
+                transition: 'all 0.3s ease',
                 }}
               >
-                <Box sx={{ opacity: 0.9, color: 'primary.light' }}>{item.icon}</Box>
+                <Box sx={{ opacity: 0.9, color: 'primary.light', '& .MuiSvgIcon-root': { fontSize: 36 } }}>{item.icon}</Box>
                 <div>
                   <Typography gutterBottom sx={{ fontWeight: 'medium' }}>
                     {item.title}
@@ -116,6 +124,7 @@ export default function Highlights() {
                   </Typography>
                 </div>
               </Stack>
+              </motion.div>
             </Grid>
           ))}
         </Grid>

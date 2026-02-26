@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import AppTheme from './shared-theme/AppTheme';
 import { AuthProvider } from './contexts/AuthContext';
+import { WhitelistStatusProvider } from './contexts/WhitelistStatusContext';
 import MarketingPage from './marketing-page/MarketingPage';
 import LoginPage from './pages/LoginPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
@@ -14,6 +15,7 @@ export default function App() {
     <AppTheme>
       <CssBaseline enableColorScheme />
       <AuthProvider>
+      <WhitelistStatusProvider>
       <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Routes>
           <Route path="/" element={<MarketingPage />} />
@@ -24,6 +26,7 @@ export default function App() {
           <Route path="/shop" element={<ShopPage />} />
         </Routes>
       </BrowserRouter>
+      </WhitelistStatusProvider>
       </AuthProvider>
     </AppTheme>
   );

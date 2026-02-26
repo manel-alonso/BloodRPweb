@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { motion } from 'framer-motion';
 import Box from '@mui/material/Box';
 import { assetUrl } from '../../utils/assetUrl';
 import Button from '@mui/material/Button';
@@ -179,8 +180,14 @@ export default function Features() {
             }}
           >
             {items.map(({ icon, title, description }, index) => (
-              <Box
+              <motion.div
                 key={index}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.4 }}
+              >
+              <Box
                 component={Button}
                 onClick={() => handleItemClick(index)}
                 sx={[
@@ -219,6 +226,7 @@ export default function Features() {
                   <Typography variant="body2">{description}</Typography>
                 </Box>
               </Box>
+              </motion.div>
             ))}
           </Box>
           <MobileLayout

@@ -12,6 +12,7 @@ import Chip from '@mui/material/Chip';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import { useAuth } from '../contexts/AuthContext';
+import { useWhitelistStatus } from '../contexts/WhitelistStatusContext';
 import { assetUrl } from '../utils/assetUrl';
 
 const YOUTUBE_VIDEO_ID = 'oTmImIk9Ukk';
@@ -64,6 +65,8 @@ export default function WhitelistPage() {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  const { setStatus: setWhitelistStatus } = useWhitelistStatus();
+
   const fetchStatus = useCallback(async () => {
     if (!user?.id) return;
     setStatus('loading');
@@ -76,6 +79,7 @@ export default function WhitelistPage() {
         const json = (await res.json()) as WhitelistResponse;
         setData(json);
         setStatus('success');
+        setWhitelistStatus(json.status, json.hasSubmittedRevision);
       } else {
         setErrorDetail(`api_${res.status}`);
         setStatus('error');
@@ -90,7 +94,7 @@ export default function WhitelistPage() {
         console.error('Whitelist fetch failed:', err);
       }
     }
-  }, [user?.id]);
+  }, [user?.id, setWhitelistStatus]);
 
   useEffect(() => {
     if (!user) {
@@ -184,7 +188,8 @@ export default function WhitelistPage() {
           display: 'flex',
           alignItems: 'flex-start',
           justifyContent: 'center',
-          py: 4,
+          pt: 'calc(var(--template-frame-height, 0px) + 120px)',
+          pb: 4,
           overflow: 'hidden',
         }}
       >
@@ -232,11 +237,11 @@ export default function WhitelistPage() {
         </Box>
 
         <Container
-          maxWidth="sm"
+          maxWidth="lg"
           sx={{
             position: 'relative',
             zIndex: 1,
-            maxHeight: 'calc(100vh - 64px)',
+            maxHeight: 'calc(100vh - 140px)',
             overflowY: 'auto',
             overflowX: 'hidden',
             py: 2,
@@ -298,7 +303,13 @@ export default function WhitelistPage() {
                   <Chip
                     label={statusLabel}
                     color={statusColor}
-                    sx={{ mb: 2, fontWeight: 600 }}
+                    sx={{
+                      mb: 2,
+                      fontWeight: 700,
+                      fontSize: '1rem',
+                      py: 1.5,
+                      px: 2,
+                    }}
                   />
                   <Typography
                     variant="body1"

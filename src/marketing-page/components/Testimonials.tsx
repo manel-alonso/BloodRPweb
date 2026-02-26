@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -88,6 +89,13 @@ export default function Testimonials() {
       <Grid container spacing={2}>
         {userTestimonials.map((testimonial, index) => (
           <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index} sx={{ display: 'flex' }}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.08, duration: 0.5 }}
+              style={{ width: '100%', display: 'flex' }}
+            >
             <Card
               variant="outlined"
               sx={{
@@ -95,6 +103,13 @@ export default function Testimonials() {
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 flexGrow: 1,
+                width: '100%',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  boxShadow: '0 4px 20px rgba(180,0,0,0.15)',
+                  transform: 'translateY(-4px)',
+                },
               }}
             >
               <CardContent>
@@ -112,6 +127,7 @@ export default function Testimonials() {
                 subheader={testimonial.occupation}
               />
             </Card>
+            </motion.div>
           </Grid>
         ))}
       </Grid>

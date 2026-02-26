@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -94,11 +95,17 @@ export default function Pricing() {
         spacing={3}
         sx={{ alignItems: 'center', justifyContent: 'center', width: '100%' }}
       >
-        {tiers.map((tier) => (
+        {tiers.map((tier, index) => (
           <Grid
             size={{ xs: 12, sm: tier.title === 'VIP Élite' ? 12 : 6, md: 4 }}
             key={tier.title}
           >
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.15, duration: 0.5 }}
+            >
             <Card
               sx={[
                 {
@@ -109,16 +116,24 @@ export default function Pricing() {
                 },
                 tier.title === 'VIP Premium' &&
                   ((theme) => ({
-                    border: 'none',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
                     background:
                       'radial-gradient(circle at 50% 0%, hsl(0, 70%, 25%), hsl(0, 0%, 6%))',
-                    boxShadow: `0 8px 12px hsla(0, 50%, 20%, 0.4)`,
+                    boxShadow: `0 8px 32px hsla(0, 50%, 30%, 0.4)`,
+                    transform: { md: 'scale(1.05)' },
                     ...theme.applyStyles('dark', {
                       background:
                         'radial-gradient(circle at 50% 0%, hsl(0, 60%, 20%), hsl(0, 0%, 10%))',
-                      boxShadow: `0 8px 12px hsla(0, 0%, 0%, 0.8)`,
+                      boxShadow: `0 8px 32px hsla(0, 0%, 0%, 0.6)`,
                     }),
                   })),
+                tier.title !== 'VIP Premium' && {
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    boxShadow: '0 4px 20px rgba(180,0,0,0.2)',
+                  },
+                },
               ]}
             >
               <CardContent>
@@ -204,6 +219,7 @@ export default function Pricing() {
                 </Button>
               </CardActions>
             </Card>
+            </motion.div>
           </Grid>
         ))}
       </Grid>
