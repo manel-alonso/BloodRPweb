@@ -29,7 +29,7 @@ const tiers = [
   {
     title: 'VIP Premium',
     subheader: 'Recomendado',
-    price: '0',
+    price: '1',
     description: [
       'Todo lo de Jugador',
       'Kit VIP exclusivo',
@@ -44,7 +44,7 @@ const tiers = [
   },
   {
     title: 'VIP Élite',
-    price: '0',
+    price: '1',
     description: [
       'Todo lo de VIP Premium',
       'Rangos exclusivos',
@@ -170,7 +170,7 @@ export default function Pricing() {
                   ]}
                 >
                   <Typography component="h3" variant="h2">
-                    {tier.price === '0' ? 'Gratis' : `$${tier.price}`}
+                    {tier.price > '0' ? 'Próximamente...' : `$${tier.price}`}
                   </Typography>
                   {tier.price !== '0' && (
                     <Typography component="h3" variant="h6">

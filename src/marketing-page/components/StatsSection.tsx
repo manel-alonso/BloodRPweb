@@ -10,9 +10,9 @@ import EmojiEventsRoundedIcon from '@mui/icons-material/EmojiEventsRounded';
 import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
 
 const stats = [
-  { icon: <PeopleRoundedIcon />, value: '500+', label: 'Jugadores activos' },
+  { icon: <PeopleRoundedIcon />, value: 'Scripts', label: 'únicos' },
   { icon: <ScheduleRoundedIcon />, value: '24/7', label: 'Servidor online' },
-  { icon: <EmojiEventsRoundedIcon />, value: '50+', label: 'Trabajos' },
+  { icon: <EmojiEventsRoundedIcon />, value: 'Bandas y negocios', label: 'gratis' },
   { icon: <SecurityRoundedIcon />, value: '100%', label: 'Anti-cheat' },
 ];
 
